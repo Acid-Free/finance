@@ -64,7 +64,8 @@ def login():
     # Forget any user_id but maintain flashed messages
     flashes = session.get("_flashes")
     session.clear()
-    session["_flashes"] = flashes
+    if flashes:
+        session["_flashes"] = flashes
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
