@@ -61,8 +61,10 @@ def history():
 def login():
     """Log user in"""
 
-    # Forget any user_id
+    # Forget any user_id but maintain flashed messages
+    flashes = session.get("_flashes")
     session.clear()
+    session["_flashes"] = flashes
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -115,17 +117,36 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
+    username = request.form.get("username")
+
     if request.method == "POST":
-        if not request.form.get("username"):
+        if not username:
             return apology("must provide username", 403)
 
         username_row = db.execute("SELECT * FROM users WHERE username = ?",
                                   request.form.get("username"))
+
         if len(username_row) > 0:
             return apology("username already exists", 403)
 
-        # TODO: Remove later
-        return redirect("/register")
+        password = request.form.get("password")
+        password_confirm = request.form.get("password-confirm")
+
+        if not password:
+            return apology("must provide password", 403)
+
+        if not password_confirm:
+            return apology("must provide password confirmation", 403)
+
+        if password != password_confirm:
+            return apology("must match password", 403)
+
+        # Performed if inputs are valid
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)",
+                   username, generate_password_hash(password))
+
+        flash("Account created successfully.")
+        return redirect("/login")
     else:
         print("test1")
         return render_template("register.html")
