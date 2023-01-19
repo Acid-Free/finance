@@ -58,25 +58,61 @@ def buy():
         if not lookup_result:
             return apology("symbol is invalid", 400)
 
-        shares = request.form.get("shares")
-        if not shares:
+        share_count = request.form.get("shares")
+        share_count = int(share_count)
+        if not share_count:
             return apology("must provide shares", 400)
 
-        if shares < 1:
+        if share_count < 1:
             return apology("shares must be at least 1", 400)
 
+        # Extract lookup result
+        name = lookup_result["name"]
+        price = float(lookup_result["price"])
+        symbol = lookup_result["symbol"]
+
+        # Query database for balance
+        row = db.execute(
+            "SELECT cash FROM users WHERE id = ?", session["user_id"])
+        balance = row[0]["cash"]
+
+        # Check if user can purchase the stock
+        total_cost = price * share_count
+
+        if (total_cost > balance):
+            return apology("cash balance not enough", 400)
+
+        # Purchase stock
+        db.execute("INSERT INTO transactions (shares, price, date) VALUES (?, ?, ?)",
+                   share_count, price, datetime.now().strftime("%m/%d/%Y: %H:%M:%S"))
+
+        row = db.execute("SELECT MAX(id) AS LAST FROM transactions")
+        transaction_id = int(row[0]["LAST"])
+
+        db.execute("INSERT INTO buys (user_id, transaction_id) VALUES (?, ?)",
+                   session["user_id"], transaction_id)
+
+        # Decrease user account balance
+        new_balance = balance - total_cost
+        db.execute("UPDATE users SET cash=? WHERE id=?",
+                   new_balance, session["user_id"])
+
+        flash_text = "Successfully purchased {0} for {1:}. New balance: {2}"
+        flash(flash_text.format(symbol, usd(total_cost), usd(new_balance)))
+
+        return redirect("/")
     else:
         return render_template("buy.html")
 
 
-@app.route("/history")
-@login_required
+@ app.route("/history")
+@ login_required
 def history():
     """Show history of transactions"""
     return apology("TODO")
 
 
-@app.route("/login", methods=["GET", "POST"])
+@ app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
@@ -116,7 +152,7 @@ def login():
         return render_template("login.html")
 
 
-@app.route("/logout")
+@ app.route("/logout")
 def logout():
     """Log user out"""
 
@@ -127,8 +163,8 @@ def logout():
     return redirect("/")
 
 
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
+@ app.route("/quote", methods=["GET", "POST"])
+@ login_required
 def quote():
     """Get stock quote."""
     if request.method == "POST":
@@ -140,15 +176,17 @@ def quote():
         if not lookup_result:
             return apology("symbol is invalid", 400)
 
+        # Extract lookup result
         name = lookup_result["name"]
         price = lookup_result["price"]
         symbol = lookup_result["symbol"]
+
         return render_template("quoted.html", name=name, price=price, symbol=symbol)
     else:
         return render_template("quote.html")
 
 
-@app.route("/register", methods=["GET", "POST"])
+@ app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
     username = request.form.get("username")
@@ -186,8 +224,8 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
+@ app.route("/sell", methods=["GET", "POST"])
+@ login_required
 def sell():
     """Sell shares of stock"""
     return apology("TODO")
