@@ -81,15 +81,16 @@ def buy():
         if (total_cost > balance):
             return apology("cash balance not enough", 400)
 
+        # Get current date time
+        current_datetime = datetime.now().strftime("%m/%d/%Y: %H:%M:%S")
+
         # Purchase stock
-        db.execute("INSERT INTO portfolio (shares, price, date) VALUES (?, ?, ?)",
-                   share_count, price, datetime.now().strftime("%m/%d/%Y: %H:%M:%S"))
+        db.execute("INSERT INTO portfolio (user_id, shares, price, date) VALUES (?, ?, ?, ?)",
+                   session["user_id"], share_count, price, current_datetime)
 
-        row = db.execute("SELECT MAX(id) AS LAST FROM portfolio")
-        transaction_id = int(row[0]["LAST"])
-
-        db.execute("INSERT INTO interactions (user_id, transaction_id) VALUES (?, ?)",
-                   session["user_id"], transaction_id)
+        # Add transaction history entry
+        db.execute("INSERT INTO transactions (user_id, shares, price, date) VALUES (?, ?, ?, ?)",
+                   session["user_id"], share_count, price, current_datetime)
 
         # Decrease user account balance
         new_balance = balance - total_cost
