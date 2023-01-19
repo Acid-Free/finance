@@ -41,7 +41,12 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return render_template("index.html")
+
+    rows = db.execute(
+        "SELECT * FROM portfolio join users on user_id = users.id WHERE user_id = ?",
+        session["user_id"])
+
+    return render_template("index.html", rows=rows)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -58,10 +63,10 @@ def buy():
             return apology("symbol is invalid", 400)
 
         share_count = request.form.get("shares")
-        share_count = int(share_count)
         if not share_count:
             return apology("must provide shares", 400)
 
+        share_count = int(share_count)
         if share_count < 1:
             return apology("shares must be at least 1", 400)
 
