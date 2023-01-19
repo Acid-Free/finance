@@ -90,12 +90,12 @@ def buy():
         current_datetime = datetime.now().strftime("%m/%d/%Y: %H:%M:%S")
 
         # Purchase stock
-        db.execute("INSERT INTO portfolio (user_id, shares, price, date) VALUES (?, ?, ?, ?)",
-                   session["user_id"], share_count, price, current_datetime)
+        db.execute("INSERT INTO portfolio (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
+                   session["user_id"], symbol, name, share_count, price, current_datetime)
 
         # Add transaction history entry
-        db.execute("INSERT INTO transactions (user_id, shares, price, date) VALUES (?, ?, ?, ?)",
-                   session["user_id"], share_count, price, current_datetime)
+        db.execute("INSERT INTO transactions (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
+                   session["user_id"], symbol, name, share_count, price, current_datetime)
 
         # Decrease user account balance
         new_balance = balance - total_cost
