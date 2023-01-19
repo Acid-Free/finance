@@ -13,5 +13,14 @@ Quote Result
     <th>Price</th>
     <th>Total</th>
   </tr>
+  {% for row in rows: %}
+  <tr>
+    <th>{{row["symbol"]}}</th>
+    <th>{{row["name"]}}</th>
+    <th>{{row["shares"]}}</th>
+    <th>{{row["price"]}}</th>
+    <th>{{row["price"]}}</th>
+  </tr>
+  {% endfor %}
 </table>
 {% endblock %}
