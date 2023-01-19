@@ -6,6 +6,7 @@ Quote Result
 
 {% block main %}
 <table class="table table-striped table-sm">
+  {% set ns = namespace(total=user_balance) %}
   <tr>
     <th>Symbol</th>
     <th>Name</th>
@@ -15,12 +16,30 @@ Quote Result
   </tr>
   {% for row in rows: %}
   <tr>
-    <th>{{row["symbol"]}}</th>
-    <th>{{row["name"]}}</th>
-    <th>{{row["shares"]}}</th>
-    <th>{{row["price"]}}</th>
-    <th>{{row["date"]}}</th>
+    {% set current = row["shares"] * row["price"]%}
+    {% set ns.total = ns.total + current %}
+    <td>{{row["symbol"]}}</td>
+    <td>{{row["name"]}}</td>
+    <td>{{row["shares"]}}</td>
+    <td>{{row["price"] | usd}}</td>
+    <td>{{current | usd}}</td>
   </tr>
   {% endfor %}
+  <tfoot>
+    <tr>
+      <td class="border-0"></td>
+      <td class="border-0"></td>
+      <td class="border-0"></td>
+      <td class="border-0 fw-bold">Cash</td>
+      <td class="border-0">{{user_balance}}</td>
+    </tr>
+    <tr>
+      <td class="border-0"></td>
+      <td class="border-0"></td>
+      <td class="border-0"></td>
+      <td class="border-0 fw-bold">Total</td>
+      <td class="border-0">{{ns.total}}</td>
+    </tr>
+  </tfoot>
 </table>
 {% endblock %}

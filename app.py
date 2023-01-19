@@ -46,7 +46,10 @@ def index():
         "SELECT * FROM portfolio join users on user_id = users.id WHERE user_id = ?",
         session["user_id"])
 
-    return render_template("index.html", rows=rows)
+    user_balance = db.execute(
+        "SELECT * FROM users WHERE id = ? ", session["user_id"])[0]["cash"]
+
+    return render_template("index.html", rows=rows, user_balance=user_balance)
 
 
 @app.route("/buy", methods=["GET", "POST"])
