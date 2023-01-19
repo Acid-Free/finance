@@ -89,11 +89,20 @@ def buy():
         # Get current date time
         current_datetime = datetime.now().strftime("%m/%d/%Y: %H:%M:%S")
 
-        # Purchase stock
-        db.execute("INSERT INTO portfolio (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
-                   session["user_id"], symbol, name, share_count, price, current_datetime)
+        # Check if portfolio entry already exists (should be the same price too, for now different priced entry are considered different)
+        rows = db.execute(
+            "SELECT * FROM portfolio WHERE symbol = ? AND user_id = ? AND price = ?", symbol, session["user_id"], price)
+        if len(rows) == 0:
+            db.execute("INSERT INTO portfolio (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
+                       session["user_id"], symbol, name, share_count, price, current_datetime)
+        else:
+            current_share_id = rows[0]["id"]
+            current_share_count = rows[0]["shares"] + share_count
 
-        # Add transaction history entry
+            db.execute("UPDATE portfolio SET shares = ?, date = ? WHERE id = ?",
+                       current_share_count, current_datetime, current_share_id)
+
+            # Add transaction history entry
         db.execute("INSERT INTO transactions (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
                    session["user_id"], symbol, name, share_count, price, current_datetime)
 
