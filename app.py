@@ -58,6 +58,13 @@ def buy():
         if not lookup_result:
             return apology("symbol is invalid", 400)
 
+        shares = request.form.get("shares")
+        if not shares:
+            return apology("must provide shares", 400)
+
+        if shares < 1:
+            return apology("shares must be at least 1", 400)
+
     else:
         return render_template("buy.html")
 
