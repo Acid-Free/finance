@@ -41,8 +41,7 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    now = datetime.now().strftime("%m/%d/%Y: %H:%M:%S")
-    return apology(now)
+    return render_template("index.html")
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -83,13 +82,13 @@ def buy():
             return apology("cash balance not enough", 400)
 
         # Purchase stock
-        db.execute("INSERT INTO transactions (shares, price, date) VALUES (?, ?, ?)",
+        db.execute("INSERT INTO portfolio (shares, price, date) VALUES (?, ?, ?)",
                    share_count, price, datetime.now().strftime("%m/%d/%Y: %H:%M:%S"))
 
-        row = db.execute("SELECT MAX(id) AS LAST FROM transactions")
+        row = db.execute("SELECT MAX(id) AS LAST FROM portfolio")
         transaction_id = int(row[0]["LAST"])
 
-        db.execute("INSERT INTO buys (user_id, transaction_id) VALUES (?, ?)",
+        db.execute("INSERT INTO interactions (user_id, transaction_id) VALUES (?, ?)",
                    session["user_id"], transaction_id)
 
         # Decrease user account balance
