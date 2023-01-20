@@ -105,17 +105,17 @@ def buy():
             db.execute("UPDATE portfolio SET shares = ?, date = ? WHERE id = ?",
                        current_share_count, current_datetime, current_share_id)
 
-            # Add transaction history entry
-        db.execute("INSERT INTO transactions (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
-                   session["user_id"], symbol, name, share_count, price, current_datetime)
-
         # Decrease user account balance
         new_balance = balance - total_cost
         db.execute("UPDATE users SET cash=? WHERE id=?",
                    new_balance, session["user_id"])
 
-        flash_text = "Successfully purchased {0} for {1:}. New balance: {2}"
-        flash(flash_text.format(symbol, usd(total_cost), usd(new_balance)))
+        # Add transaction history entry
+        db.execute("INSERT INTO transactions (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
+                   session["user_id"], symbol, name, share_count, price, current_datetime)
+
+        flash_text = "Successfully purchased {0} {1} for {2}."
+        flash(flash_text.format(share_count, symbol, usd(total_cost)))
 
         return redirect("/")
     else:
@@ -277,15 +277,35 @@ def sell():
         if current_share_count < share_count:
             return apology("Insufficient share count", 400)
 
-        # Update portfolio
+        # Get current date time
+        current_datetime = datetime.now().strftime("%m/%d/%Y: %H:%M:%S")
+
+        # Update portfolio: delete entry if share count will become 0
+        new_share_count = current_share_count - share_count
+        if new_share_count == 0:
+            pass
+        else:
+            rows = db.execute("UPDATE portfolio SET shares = ?, price = ? WHERE symbol = ? AND user_id = ?",
+                              new_share_count, price, symbol, session["user_id"])
 
         # Update user account
+        sell_price = price * share_count
+        rows = db.execute("UPDATE users SET cash = cash + ? WHERE id = ?",
+                          sell_price, session["user_id"])
 
-        return apology("TODO: Valid input at least", 400)
+        # Update transactions
+        db.execute("INSERT INTO transactions (user_id, symbol, name, shares, price, date) VALUES (?, ?, ?, ?, ?, ?)",
+                   session["user_id"], symbol, name, -share_count, price, current_datetime)
+
+        flash_text = "Successfully sold {0} {1} for {2}"
+        flash(flash_text.format(share_count, symbol, usd(sell_price)))
+
+        return redirect("/")
     else:
         return render_template("sell.html")
 
 
-def update_share_prices():
-    # TODO: implement and invoke whenever viewing / and selling
+# Updates the share price of a particular share on current user
+def update_share_price():
+    # TODO: implement and invoke whenever viewing the index
     pass
