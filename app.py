@@ -238,6 +238,18 @@ def register():
         if not password:
             return apology("must provide password", 403)
 
+        # Password should have at least 3 letters and 3 numbers
+        letter_count = 0
+        number_count = 0
+        for char in password:
+            if char.isalpha():
+                letter_count = letter_count + 1
+            elif char.isdigit():
+                number_count = number_count + 1
+
+        if letter_count < 3 or number_count < 3:
+            return apology("password must contain at least 3 numbers and letters each", 400)
+
         if not password_confirm:
             return apology("must provide password confirmation", 403)
 
