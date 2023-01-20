@@ -17,10 +17,10 @@ History
   {% for row in rows: %}
   <tr>
     <td>{{row["symbol"]}}</td>
-    <td>{{row["name"]}}</td>
+    <td>{{row["type"]}}</td>
     <td>{{row["shares"]}}</td>
     <td>{{row["price"] | usd}}</td>
-    <td>{{current | usd}}</td>
+    <td>{{row["date"]}}</td>
   </tr>
   {% endfor %}
 </table>

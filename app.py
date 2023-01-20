@@ -129,10 +129,18 @@ def buy():
 @ login_required
 def history():
     """Show history of transactions"""
-    if request.method == "POST":
-        pass
-    else:
-        return render_template("history.html")
+
+    rows = db.execute(
+        "SELECT * FROM transactions WHERE user_id = ?", session["user_id"])
+
+    for row in rows:
+        if row["shares"] < 0:
+            row["shares"] = abs(row["shares"])
+            row["type"] = "sell"
+        else:
+            row["type"] = "buy"
+
+    return render_template("history.html", rows=rows)
 
 
 @ app.route("/login", methods=["GET", "POST"])
