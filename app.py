@@ -337,7 +337,9 @@ def sell():
 
         return redirect("/")
     else:
-        return render_template("sell.html")
+        stocks = db.execute(
+            "SELECT symbol from portfolio WHERE user_id = ?", session["user_id"])
+        return render_template("sell.html", stocks=stocks)
 
 
 # Updates the share price of a particular share on current user

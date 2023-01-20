@@ -8,8 +8,12 @@ Sell
 
 <form action="/sell" method="post">
   <div class="mb-3">
-    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="symbol" name="symbol"
-      placeholder="Symbol" type="text">
+    <select class="form-control mx-auto w-auto" id="symbol" name="symbol">
+      <option disabled hidden selected>Select stock</option>
+      {% for stock in stocks %}
+      <option value="{{stock['symbol']}}">{{stock["symbol"]}}</option>
+      {% endfor %}
+    </select>
     <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="shares" min="1" name="shares"
       placeholder="Shares" type="number">
   </div>
