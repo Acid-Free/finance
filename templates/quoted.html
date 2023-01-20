@@ -5,5 +5,5 @@ Quote Result
 {% endblock %}
 
 {% block main %}
-<p>({{symbol}}) {{name}} : {{price}}</p>
+<p>({{symbol}}) {{name}} : {{price | usd}}</p>
 {% endblock %}
