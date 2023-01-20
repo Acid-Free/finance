@@ -72,9 +72,12 @@ def buy():
         if not share_count:
             return apology("must provide shares", 400)
 
-        share_count = int(share_count)
-        if share_count < 1:
-            return apology("shares must be at least 1", 400)
+        try:
+            share_count = int(share_count)
+            if share_count < 1:
+                return apology("shares must be at least 1", 400)
+        except ValueError:
+            return apology("shares must be an int", 400)
 
         # Extract lookup result
         name = lookup_result["name"]
@@ -285,9 +288,12 @@ def sell():
         if not share_count:
             return apology("must provide shares", 400)
 
-        share_count = int(share_count)
-        if share_count < 1:
-            return apology("shares must be at least 1", 400)
+        try:
+            share_count = int(share_count)
+            if share_count < 1:
+                return apology("shares must be at least 1", 400)
+        except ValueError:
+            return apology("shares must be an int", 400)
 
         # Extract lookup result
         name = lookup_result["name"]
