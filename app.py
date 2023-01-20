@@ -271,6 +271,8 @@ def sell():
         # Check if share exists in account
         rows = db.execute(
             "SELECT * FROM portfolio WHERE symbol = ? AND user_id = ?", symbol, session["user_id"])
+        if len(rows) == 0:
+            return apology("You don't have this stock", 400)
 
         # Check if sufficient number of share exists
         current_share_count = rows[0]["shares"]
