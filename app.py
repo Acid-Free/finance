@@ -283,7 +283,8 @@ def sell():
         # Update portfolio: delete entry if share count will become 0
         new_share_count = current_share_count - share_count
         if new_share_count == 0:
-            pass
+            rows = db.execute(
+                "DELETE FROM portfolio WHERE symbol = ? AND user_id = ?", symbol, session["user_id"])
         else:
             rows = db.execute("UPDATE portfolio SET shares = ?, price = ? WHERE symbol = ? AND user_id = ?",
                               new_share_count, price, symbol, session["user_id"])
