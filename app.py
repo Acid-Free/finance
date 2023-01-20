@@ -46,6 +46,9 @@ def index():
         "SELECT * FROM portfolio join users on user_id = users.id WHERE user_id = ?",
         session["user_id"])
 
+    for row in rows:
+        update_share_price(row)
+
     user_balance = db.execute(
         "SELECT * FROM users WHERE id = ? ", session["user_id"])[0]["cash"]
 
@@ -309,6 +312,7 @@ def sell():
 
 
 # Updates the share price of a particular share on current user
-def update_share_price():
-    # TODO: implement and invoke whenever viewing the index
-    pass
+def update_share_price(row):
+    symbol = row["symbol"]
+    price = float(lookup(symbol)["price"])
+    db.execute("UPDATE portfolio SET price = ? WHERE symbol = ?", price, symbol)
