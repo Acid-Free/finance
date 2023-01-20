@@ -245,7 +245,47 @@ def register():
 @ login_required
 def sell():
     """Sell shares of stock"""
+    # TODO: refactor to remove repetition in buy()
     if request.method == "POST":
-        pass
+        raw_symbol = request.form.get("symbol")
+        if not raw_symbol:
+            return apology("must provide symbol", 400)
+
+        lookup_result = lookup(raw_symbol)
+        if not lookup_result:
+            return apology("symbol is invalid", 400)
+
+        share_count = request.form.get("shares")
+        if not share_count:
+            return apology("must provide shares", 400)
+
+        share_count = int(share_count)
+        if share_count < 1:
+            return apology("shares must be at least 1", 400)
+
+        # Extract lookup result
+        name = lookup_result["name"]
+        price = float(lookup_result["price"])
+        symbol = lookup_result["symbol"]
+
+        # Check if share exists in account
+        rows = db.execute(
+            "SELECT * FROM portfolio WHERE symbol = ? AND user_id = ?", symbol, session["user_id"])
+
+        # Check if sufficient number of share exists
+        current_share_count = rows[0]["shares"]
+        if current_share_count < share_count:
+            return apology("Insufficient share count", 400)
+
+        # Update portfolio
+
+        # Update user account
+
+        return apology("TODO: Valid input at least", 400)
     else:
         return render_template("sell.html")
+
+
+def update_share_prices():
+    # TODO: implement and invoke whenever viewing / and selling
+    pass
