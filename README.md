@@ -8,7 +8,7 @@ Problem Set Solution for CS50 2022 Week 9
 
 
 ## Summary
-Finance is a web app which you can manage stocks. It allows real time checking of stock prices, purchasing and selling stocks by utilizing IEX API.
+Finance is a web app where you can manage stocks. It allows real time checking of stock prices, purchasing and selling stocks by utilizing IEX API.
 
 ## Technologies
 * Python (flask)
